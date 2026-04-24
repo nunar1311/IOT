@@ -1,0 +1,370 @@
+[
+    {
+        "id": "e44d32bb3fbd850e",
+        "type": "tab",
+        "label": "Smart Room Flow",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "f818cc63e792e340",
+        "type": "mqtt in",
+        "z": "e44d32bb3fbd850e",
+        "name": "Environment Sensors",
+        "topic": "iot/sensors/env",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "c35b8cf0f2a714a6",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 140,
+        "wires": [
+            [
+                "61a868953112c3f8",
+                "8cb2f43d8b5eb604",
+                "a1f6a15db4d1a58e"
+            ]
+        ]
+    },
+    {
+        "id": "61a868953112c3f8",
+        "type": "function",
+        "z": "e44d32bb3fbd850e",
+        "name": "Extract Temp",
+        "func": "msg.payload = msg.payload.temperature;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 100,
+        "wires": [
+            [
+                "b1b423eb3469a48d",
+                "4a4f89d3d3a4369e"
+            ]
+        ]
+    },
+    {
+        "id": "8cb2f43d8b5eb604",
+        "type": "function",
+        "z": "e44d32bb3fbd850e",
+        "name": "Extract Humidity",
+        "func": "msg.payload = msg.payload.humidity;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 160,
+        "wires": [
+            [
+                "6e343bce226c117b"
+            ]
+        ]
+    },
+    {
+        "id": "b1b423eb3469a48d",
+        "type": "switch",
+        "z": "e44d32bb3fbd850e",
+        "name": "Temp > 30?",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "30",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 570,
+        "y": 80,
+        "wires": [
+            [
+                "e50e90c663a89053"
+            ]
+        ]
+    },
+    {
+        "id": "e50e90c663a89053",
+        "type": "function",
+        "z": "e44d32bb3fbd850e",
+        "name": "Format Telegram (Temp)",
+        "func": "msg.payload = {\n    chatId: \"\", // Set in Telegram node\n    type: \"message\",\n    content: \"⚠️ Nhiệt độ phòng cao: \" + msg.payload.toFixed(1) + \"°C\"\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 80,
+        "wires": [
+            [
+                "f9b7c8f2b7f382ef"
+            ]
+        ]
+    },
+    {
+        "id": "a1f6a15db4d1a58e",
+        "type": "function",
+        "z": "e44d32bb3fbd850e",
+        "name": "Extract Gas",
+        "func": "msg.payload = msg.payload.gas_raw;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 220,
+        "wires": [
+            [
+                "2f82fc46ff2e8113"
+            ]
+        ]
+    },
+    {
+        "id": "2f82fc46ff2e8113",
+        "type": "switch",
+        "z": "e44d32bb3fbd850e",
+        "name": "Gas >= 1200?",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "1200",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 570,
+        "y": 220,
+        "wires": [
+            [
+                "1c356af3e24eb5ee"
+            ]
+        ]
+    },
+    {
+        "id": "1c356af3e24eb5ee",
+        "type": "function",
+        "z": "e44d32bb3fbd850e",
+        "name": "Format Telegram (Gas)",
+        "func": "msg.payload = {\n    chatId: \"\", \n    type: \"message\",\n    content: \"🚨 NGUY HIỂM! Phát hiện rò rỉ khí gas! Mức: \" + msg.payload\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 220,
+        "wires": [
+            [
+                "f9b7c8f2b7f382ef"
+            ]
+        ]
+    },
+    {
+        "id": "4a4f89d3d3a4369e",
+        "type": "ui_gauge",
+        "z": "e44d32bb3fbd850e",
+        "name": "Temperature",
+        "group": "52857502aa8c0570",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Nhiệt độ",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "28",
+        "seg2": "35",
+        "diff": false,
+        "className": "",
+        "x": 610,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "6e343bce226c117b",
+        "type": "ui_gauge",
+        "z": "e44d32bb3fbd850e",
+        "name": "Humidity",
+        "group": "52857502aa8c0570",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "water",
+        "title": "Độ ẩm",
+        "label": "%",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 600,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "f9b7c8f2b7f382ef",
+        "type": "debug",
+        "z": "e44d32bb3fbd850e",
+        "name": "Telegram Sub (dummy)",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1070,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "27c73db2fecfacc1",
+        "type": "mqtt in",
+        "z": "e44d32bb3fbd850e",
+        "name": "Face Recognition Alert",
+        "topic": "iot/door/status",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "c35b8cf0f2a714a6",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 140,
+        "y": 380,
+        "wires": [
+            [
+                "bda2a2cfcff29a1b"
+            ]
+        ]
+    },
+    {
+        "id": "bda2a2cfcff29a1b",
+        "type": "switch",
+        "z": "e44d32bb3fbd850e",
+        "name": "Unknown Face?",
+        "property": "payload.event",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "unknown_face",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 380,
+        "y": 380,
+        "wires": [
+            [
+                "cbf2d8f99ad484fd"
+            ]
+        ]
+    },
+    {
+        "id": "cbf2d8f99ad484fd",
+        "type": "function",
+        "z": "e44d32bb3fbd850e",
+        "name": "Format Telegram (Security)",
+        "func": "msg.payload = {\n    chatId: \"\",\n    type: \"message\",\n    content: \"🔴 CẢNH BÁO AN NINH: Người lạ đang ở cửa!\"\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 380,
+        "wires": [
+            [
+                "f9b7c8f2b7f382ef"
+            ]
+        ]
+    },
+    {
+        "id": "c35b8cf0f2a714a6",
+        "type": "mqtt-broker",
+        "name": "Local Mosquitto",
+        "broker": "mosquitto",
+        "port": "1883",
+        "clientid": "nodered",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "52857502aa8c0570",
+        "type": "ui_group",
+        "name": "Environment",
+        "tab": "20d8efd23c10ccab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "20d8efd23c10ccab",
+        "type": "ui_tab",
+        "name": "Smart Room",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]

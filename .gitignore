@@ -1,0 +1,88 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env
+.env
+
+# Node/JavaScript
+node_modules/
+dist/
+build/
+.npm
+.yarn
+
+# C/C++ / Arduino
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+*.bin
+*.hex
+*.elf
+
+# Logs and Databases
+*.log
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+*.s3db
+*.dat
+
+# Large Machine Learning Models & Data
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.onnx
+*.pickle
+*.pkl
+*.pb
+*.csv
+*.tsv
+
+# Large Archives
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Images/Videos (optional: uncomment to ignore)
+*.mp4
+*.avi
+*.mov
+*.jpg
+*.jpeg
+*.png
+
+# OS/IDE generated files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+
+# Added by code-review-graph
+.code-review-graph/
+
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.claude/
+.cursor/
+.kiro/
+.cursorrules
+.opencode.json
+.mcp.json
+.windsurfrules
