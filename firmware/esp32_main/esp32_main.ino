@@ -56,6 +56,9 @@ bool motionLightActive1 = false;  // true = đang ở chế độ BRIGHT
 unsigned long motionLightTimer2 = 0;
 bool motionLightActive2 = false;  // true = đèn đang BẬT
 
+// Both Rooms (Relay 4)
+bool relay4Active = false; // true = Relay 4 đang bật do 2 PIR
+
 // Previous alert states (avoid repeated alerts)
 bool prevGasAlert = false;
 bool prevCOAlert = false;
@@ -200,46 +203,60 @@ void runAutomation() {
   // Room 2: Relay 4 (GPIO 14)      →  TẮT khi không có người, BẬT khi có người
   // ============================================================
 
-  // --- PHÒNG 1: PIR Room1 → KY-019 dim/bright ---
+  // --- PHÒNG 1: PIR Room1 → Relay 1 + KY-019 + Relay 4 ---
   if (motion.pirRoom1) {
-    // Phát hiện người → bật sáng rõ (BRIGHT)
+    // Phát hiện người → bật sáng rõ (BRIGHT) + Relay 4
     if (!motionLightActive1) {
-      actuators.setPIRLight(1, true);   // KY-019 → BRIGHT_LEVEL
+      actuators.setPIRLight(1, true);   // KY-019 → BRIGHT_LEVEL + Relay 1 ON
+      actuators.setRelay(4, true);      // Relay 4 → ON
       motionLightActive1 = true;
-      mqtt.publishAlert("motion", "Phong 1: Phat hien nguoi - Den sang ro", "info");
-      mqtt.publishSystemStatus(); // Cập nhật ngay trạng thái lên web
-      Serial.println("[PIR] Phong 1: Co nguoi → Den SANG RO (KY-019 BRIGHT & Relay 1 ON)");
+      relay4Active = true;
+      mqtt.publishAlert("motion", "Phong 1: Phat hien nguoi - Den sang ro + Relay 4 bat", "info");
+      mqtt.publishSystemStatus();
+      Serial.println("[PIR] Phong 1: Co nguoi → Relay 1 ON + Relay 4 ON");
     }
     motionLightTimer1 = now;  // Reset cooldown timer
   }
-  // Hết cooldown → tắt đèn
+  // Hết cooldown → tắt đèn phòng 1
   if (motionLightActive1 && (now - motionLightTimer1 > PIR_COOLDOWN)) {
-    actuators.setPIRLight(1, false);    // KY-019 → TẮT
+    actuators.setPIRLight(1, false);    // KY-019 → TẮT + Relay 1 OFF
     motionLightActive1 = false;
+    // Relay 4: chỉ tắt nếu phòng 2 cũng không có người
+    if (!motionLightActive2) {
+      actuators.setRelay(4, false);
+      relay4Active = false;
+    }
     mqtt.publishAlert("motion", "Phong 1: Khong co nguoi - Den tat", "info");
-    mqtt.publishSystemStatus(); // Cập nhật ngay trạng thái lên web
-    Serial.println("[PIR] Phong 1: Khong co nguoi → Den KY-019 OFF & Relay 1 OFF (timeout)");
+    mqtt.publishSystemStatus();
+    Serial.println("[PIR] Phong 1: Khong co nguoi → Relay 1 OFF (timeout)");
   }
 
-  // --- PHÒNG 2: PIR Room2 → Relay 4 ON/OFF ---
+  // --- PHÒNG 2: PIR Room2 → Relay 3 + Relay 4 ---
   if (motion.pirRoom2) {
-    // Phát hiện người → bật đèn
+    // Phát hiện người → bật đèn + Relay 4
     if (!motionLightActive2) {
-      actuators.setPIRLight(2, true);   // Relay4 → ON
+      actuators.setPIRLight(2, true);   // Relay 3 → ON
+      actuators.setRelay(4, true);      // Relay 4 → ON
       motionLightActive2 = true;
-      mqtt.publishAlert("motion", "Phong 2: Phat hien nguoi - Den bat", "info");
-      mqtt.publishSystemStatus(); // Cập nhật ngay trạng thái lên web
-      Serial.println("[PIR] Phong 2: Co nguoi → Den BAT (Relay4 ON)");
+      relay4Active = true;
+      mqtt.publishAlert("motion", "Phong 2: Phat hien nguoi - Den bat + Relay 4 bat", "info");
+      mqtt.publishSystemStatus();
+      Serial.println("[PIR] Phong 2: Co nguoi → Relay 3 ON + Relay 4 ON");
     }
     motionLightTimer2 = now;  // Reset cooldown timer
   }
-  // Hết cooldown → tắt đèn
+  // Hết cooldown → tắt đèn phòng 2
   if (motionLightActive2 && (now - motionLightTimer2 > PIR_COOLDOWN)) {
-    actuators.setPIRLight(2, false);    // Relay4 → OFF
+    actuators.setPIRLight(2, false);    // Relay 3 → OFF
     motionLightActive2 = false;
+    // Relay 4: chỉ tắt nếu phòng 1 cũng không có người
+    if (!motionLightActive1) {
+      actuators.setRelay(4, false);
+      relay4Active = false;
+    }
     mqtt.publishAlert("motion", "Phong 2: Khong co nguoi - Den tat", "info");
-    mqtt.publishSystemStatus(); // Cập nhật ngay trạng thái lên web
-    Serial.println("[PIR] Phong 2: Khong co nguoi → Den TAT (Relay4 OFF)");
+    mqtt.publishSystemStatus();
+    Serial.println("[PIR] Phong 2: Khong co nguoi → Relay 3 OFF (timeout)");
   }
 
   // ---- TEMPERATURE-BASED FAN CONTROL ----

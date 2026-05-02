@@ -9,14 +9,14 @@
 #define CAM_CONFIG_H
 
 // WiFi
-#define WIFI_SSID "Hoang Quan"
-#define WIFI_PASSWORD "hoangquan@@"
+#define WIFI_SSID "Q"
+#define WIFI_PASSWORD "131120031"
 
 // mDNS
 #define MDNS_HOSTNAME "esp32-cam"
 
 // MQTT
-#define MQTT_SERVER "192.168.1.6"
+#define MQTT_SERVER "172.20.10.2"
 #define MQTT_PORT 1883
 #define MQTT_CLIENT_ID "esp32_cam"
 

@@ -181,34 +181,30 @@ void ActuatorManager::setRoomLight(int room, bool on) {
 // ============================================
 // PIR-Driven Light Control (độc lập từng phòng)
 // ============================================
-// Phòng 1: KY-019 (GPIO 13, PWM)
-//   - motionDetected = true  → BRIGHT_LEVEL (255) - sáng rõ hoàn toàn
-//   - motionDetected = false → DIM_LEVEL    (50)  - sáng mờ nền
-// Phòng 2: Relay 4 (GPIO 14)
+// Phòng 1: Relay 1
+//   - motionDetected = true  → BẬT (ON)
+//   - motionDetected = false → TẮT (OFF)
+// Phòng 2: Relay 3
 //   - motionDetected = true  → BẬT (ON)
 //   - motionDetected = false → TẮT (OFF)
 // ============================================
 void ActuatorManager::setPIRLight(int room, bool motionDetected) {
   if (room == 1) {
-    // --- PHÒNG 1: KY-019 PWM dim ↔ bright ---
+    // --- PHÒNG 1: Relay 1 ---
     if (motionDetected) {
-      digitalWrite(PIN_RELAY_DIM, LOW); // Bật (Active LOW)
-      setRelay(1, true); // Bật luôn đèn chính
-      relayStates[4] = true;
-      Serial.println("[PIR-LIGHT] Phong 1 → KY-019 ON & Relay1 ON");
+      setRelay(1, true);
+      Serial.println("[PIR-LIGHT] Phong 1 → Relay1 BAT (ON)");
     } else {
-      digitalWrite(PIN_RELAY_DIM, HIGH); // Tắt
-      setRelay(1, false); // Tắt đèn chính
-      relayStates[4] = false;
-      Serial.println("[PIR-LIGHT] Phong 1 → KY-019 OFF & Relay1 OFF");
+      setRelay(1, false);
+      Serial.println("[PIR-LIGHT] Phong 1 → Relay1 TAT (OFF)");
     }
   } else if (room == 2) {
-    // --- PHÒNG 2: Relay 3 OFF → ON ---
+    // --- PHÒNG 2: Relay 3 ---
     if (motionDetected) {
-      setRelay(3, true); // Bật đèn phòng 2 (Relay 3)
+      setRelay(3, true);
       Serial.println("[PIR-LIGHT] Phong 2 → Relay3 BAT (ON)");
     } else {
-      setRelay(3, false); // Tắt đèn phòng 2
+      setRelay(3, false);
       Serial.println("[PIR-LIGHT] Phong 2 → Relay3 TAT (OFF)");
     }
   }
@@ -260,6 +256,13 @@ void ActuatorManager::closeDoor() {
 // ============================================
 void ActuatorManager::setLED(int room, int color, bool state) {
   if (room == 1) {
+    // If turning on a specific LED, turn off the others to ensure only one is on
+    if (state) {
+      if (color != 0) digitalWrite(PIN_LED_R1_RED, LOW);
+      if (color != 1) digitalWrite(PIN_LED_R1_GREEN, LOW);
+      if (color != 2) digitalWrite(PIN_LED_R1_YELLOW, LOW);
+    }
+    
     switch (color) {
     case 0:
       digitalWrite(PIN_LED_R1_RED, state ? HIGH : LOW);

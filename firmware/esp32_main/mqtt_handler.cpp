@@ -9,6 +9,8 @@
 // Static instance for callback
 MQTTHandler* MQTTHandler::instance = nullptr;
 
+extern ActuatorManager actuators;
+
 // ============================================
 // Constructor
 // ============================================
@@ -184,6 +186,16 @@ void MQTTHandler::publishSystemStatus() {
   doc["ip"] = WiFi.localIP().toString();
   doc["free_heap"] = ESP.getFreeHeap();
   doc["uptime_sec"] = millis() / 1000;
+  
+  // Send relay states
+  doc["relay1"] = actuators.getRelayState(1);
+  doc["relay2"] = actuators.getRelayState(2);
+  doc["relay3"] = actuators.getRelayState(3);
+  doc["relay4"] = actuators.getRelayState(4);
+  
+  // Door state
+  doc["doorStatus"] = (actuators.getDoorState() == DOOR_OPEN || actuators.getDoorState() == DOOR_OPENING) ? "open" : "closed";
+  
   doc["timestamp"] = millis();
   
   char buffer[256];

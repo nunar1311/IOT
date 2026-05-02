@@ -216,11 +216,22 @@ void SensorManager::readPIR() {
 // Piezo - Vibration Sensor
 // ============================================
 void SensorManager::readPiezo() {
-  motionData.vibrationLevel = analogRead(PIN_PIEZO);
-  motionData.vibrationAlert = (motionData.vibrationLevel >= VIBRATION_THRESHOLD);
+  // Đọc trung bình 10 lần để lọc nhiễu (GPIO 36 không có pull-down)
+  long sum = 0;
+  for (int i = 0; i < 10; i++) {
+    sum += analogRead(PIN_PIEZO);
+    delayMicroseconds(200);
+  }
+  int avgLevel = sum / 10;
+  
+  // Lọc nhiễu nền: giá trị dưới 100 coi như = 0 (chân thả nổi)
+  if (avgLevel < 100) avgLevel = 0;
+  
+  motionData.vibrationLevel = avgLevel;
+  motionData.vibrationAlert = (avgLevel >= VIBRATION_THRESHOLD);
   
   if (motionData.vibrationAlert) {
-    Serial.printf("[PIEZO] ⚠ Vibration alert! Level: %d\n", motionData.vibrationLevel);
+    Serial.printf("[PIEZO] ⚠ Vibration alert! Level: %d\n", avgLevel);
   }
 }
 

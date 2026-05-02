@@ -13,8 +13,8 @@
 // ============================================
 // WiFi Configuration
 // ============================================
-#define WIFI_SSID "Hoang Quan"
-#define WIFI_PASSWORD "hoangquan@@"
+#define WIFI_SSID "Q"
+#define WIFI_PASSWORD "131120031"
 #define WIFI_RETRY_DELAY 5000
 #define WIFI_MAX_RETRIES 20
 
@@ -26,7 +26,7 @@
 // ============================================
 // MQTT Configuration
 // ============================================
-#define MQTT_SERVER "192.168.1.6" // IP of Python server
+#define MQTT_SERVER "172.20.10.2" // IP of Python server
 #define MQTT_PORT 1883
 #define MQTT_CLIENT_ID "esp32_main"
 #define MQTT_USERNAME "" // Set if auth enabled
@@ -122,7 +122,7 @@
 #define PM10_WARNING 40 // µg/m³ - Warning
 #define PM10_DANGER 50  // µg/m³ - Alert
 
-#define VIBRATION_THRESHOLD 500 // ADC value - Alert
+#define VIBRATION_THRESHOLD 1000 // ADC value - Alert (increased to avoid false positives)
 
 // ============================================
 // Timing Configuration (milliseconds)

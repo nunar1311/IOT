@@ -43,7 +43,7 @@ bool doorLocked = true;
 bool initCamera() {
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
-  config.ledc_timer = LEDC_TIMER_0;
+  config.ledc_timer = LEDC_TIMER_0;A
   config.pin_d0 = Y2_GPIO_NUM;
   config.pin_d1 = Y3_GPIO_NUM;
   config.pin_d2 = Y4_GPIO_NUM;
@@ -66,11 +66,11 @@ bool initCamera() {
   
   // Use PSRAM if available 
   if (psramFound()) {
-    config.frame_size = FRAMESIZE_VGA;   // 640x480
-    config.jpeg_quality = 12;
+    config.frame_size = FRAMESIZE_VGA;   // 640x480 (Required for Face Recognition)
+    config.jpeg_quality = 12;            // Balanced quality
     config.fb_count = 2;
     config.fb_location = CAMERA_FB_IN_PSRAM;
-    Serial.println("[CAM] PSRAM found, using high quality");
+    Serial.println("[CAM] PSRAM found, using VGA resolution for AI accuracy");
   } else {
     config.frame_size = FRAMESIZE_QVGA;  // 320x240
     config.jpeg_quality = 15;
@@ -132,7 +132,7 @@ esp_err_t stream_handler(httpd_req_t *req) {
     
     if (res != ESP_OK) break;
     
-    delay(30); // ~30 FPS cap
+    delay(120); // ~8 FPS (Low bandwidth, high resolution)
   }
   
   return res;

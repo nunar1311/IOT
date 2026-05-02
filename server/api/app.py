@@ -413,10 +413,20 @@ async def control_led(mode: str):
 @app.post("/api/control/door")
 async def control_door(command: str, name: str = "Dashboard"):
     """Manually control door lock."""
-    mqtt_client.publish(Config.TOPICS["door_command"], {
-        "command": command.upper(),
-        "name": name
+    # ESP32 expects {"action": "open"|"close"} on iot/control/motor
+    action = "open" if command.upper() == "UNLOCK" else "close"
+    
+    mqtt_client.publish(Config.TOPICS["control_motor"], {
+        "action": action
     })
+    
+    # Also publish to door status to simulate ESP32-CAM event for dashboard
+    if command.upper() == "UNLOCK":
+        mqtt_client.publish(Config.TOPICS["door_status"], {
+            "event": "access_granted",
+            "name": name
+        })
+        
     return {"success": True, "command": command}
 
 # ============================================
